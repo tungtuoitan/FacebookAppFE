@@ -9,6 +9,7 @@ import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {loginByDefault} from './LoginHelpers';
 import {useSnackbar} from 'notistack';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import {_getBackendToken} from './loginApis';
 
 const LeftW = styled('div')({
 })
@@ -17,7 +18,7 @@ const RightW = styled('div')({
 
 
 export const LoginPage = () => {
-    const {emailOrPhone, setEmailOrPhone, password, setPassword, showPassword, setShowPassword} = useLoginStore();
+    const {emailOrPhone, setEmailOrPhone, password, setPassword, showPassword, setShowPassword, loadingLogin, setLoadingLogin, user, setUser} = useLoginStore();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     return <>
         <div style={{
@@ -157,39 +158,37 @@ export const LoginPage = () => {
                                 Login
                             </Button>
                             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
-                                <GoogleOAuthProvider clientId={loginConstants.googleClientId}>
-                                    <GoogleLogin
-                                        onSuccess={(response) => {
-                                            console.log("Login Success:", response);
-                                        }}
-                                        onError={() => {
-                                            console.log("Login Failed");
-                                        }}
-                                        />
-                                    {/* <IconButton
-                                        style={{
-                                            margin: '6px',
-                                            padding: '0px 16px',
-                                            height:'32px',
-                                            width: '32px',
-
-                                        }}>
-                                        <img src={googleIcon} alt="Login with google" style={{width: '32px', height: '32px'}}/>
-
-                                    </IconButton> */}
-
-                                </GoogleOAuthProvider>
-                                {/* <IconButton
-                                    style={{
-                                        margin: '6px',
-                                        padding: '0px 16px',
-                                        height:'32px',
-                                        width: '32px',
-
-                                    }}>
-                                    <img src={xIcon} alt="Login with google" style={{width: '32px', height: '32px'}}/>
-
-                                </IconButton> */}
+                                <GoogleLogin
+                                    onSuccess={(response) => {
+                                        setLoadingLogin(true);
+                                        _getBackendToken(response.credential)
+                                            .then((res) => {
+                                                if(res.success) {
+                                                    enqueueSnackbar("Login successfully", { variant: 'success' });
+                                                    setUser({
+                                                        id: res.data.id,
+                                                        name: res.data.name,
+                                                        email: res.data.email,
+                                                        phone: res.data.phone,
+                                                        token: res.data.token,
+                                                    });
+                                                }
+                                                else {
+                                                    enqueueSnackbar("Login fail", { variant: 'error' });
+                                                }
+                                            })
+                                            .catch((error) => {
+                                                console.error("Error during login:", error);
+                                                enqueueSnackbar("Login fail", { variant: 'error' });
+                                            })
+                                            .finally(() => {
+                                                setLoadingLogin(false);
+                                            })
+                                    }}
+                                    onError={() => {
+                                        console.log("Login Failed");
+                                    }}
+                                    />
                             </div>
                         <Link href="#" style={{textDecoration: 'none', color: '#1877f2', fontSize: '14px', marginTop: '10px'}}>Forgotten password?</Link>
                         <div style={{height:'1px', width: '100%', margin: '20px 16px', background:'#00000030'}}> </div>

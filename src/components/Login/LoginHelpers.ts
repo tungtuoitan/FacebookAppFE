@@ -1,5 +1,5 @@
 import { constants } from "../../constants";
-import {loginDefault} from "./loginApis";
+import {_loginDefault} from "./loginApis";
 
 type props = {
     emailOrPhone: string;
@@ -21,7 +21,7 @@ export const loginByDefault = async ({
     
 }:props) => {
     try {
-        await loginDefault(token, emailOrPhone, password)
+        await _loginDefault(token, emailOrPhone, password)
         .then((response: any) => {
             if (response.status === 200) {
                 enqueueSnackbar("Login successful", {variant: "success",});

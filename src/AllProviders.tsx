@@ -1,6 +1,8 @@
 import { SnackbarKey, SnackbarProvider } from "notistack";
 import { LoginProvider } from "./components/Login/LoginStore";
 import { CloseNotiBtn } from "./components/CommonHelpers/1_CloseNotiBtn";
+import {GoogleOAuthProvider} from "@react-oauth/google";
+import {loginConstants} from "./components/Login/loginConstants";
 
 export const AllProviders = ({
     children,
@@ -11,7 +13,9 @@ export const AllProviders = ({
                 action={(id: SnackbarKey) => <CloseNotiBtn id={id} />}
                 autoHideDuration={3000}
             >
-                <LoginProvider>{children}</LoginProvider>
+                <GoogleOAuthProvider clientId={loginConstants.googleClientId}>
+                    <LoginProvider>{children}</LoginProvider>
+                </GoogleOAuthProvider>
             </SnackbarProvider>
         </>
     );

@@ -27,6 +27,7 @@ export const constants = {
     // 4. API Endpoints
     endpoints: {
         login: "auth/login",
+        login: "auth/getBackendToken",
     },
     accessRightsComponents: {
         finShark: "finShark",
