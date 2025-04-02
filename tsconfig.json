@@ -10,6 +10,13 @@
         "paths": {
             "@/*": ["src/*"],
             "@src/*": ["src/*"]
-        }
-    }
+        },
+        "allowJs": true, 
+        "skipLibCheck": true, 
+        "declaration": true, // Tạo file .d.ts (nếu cần)
+        "declarationMap": true, // Tạo file .d.ts.map để hỗ trợ navigation,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false
+        
+    },
 }
