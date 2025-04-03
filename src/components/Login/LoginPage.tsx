@@ -5,11 +5,11 @@ import {loginConstants} from './loginConstants';
 import styled from 'styled-components';
 import {useLoginStore} from './LoginStore';
 import {Visibility, VisibilityOff} from '@mui/icons-material';
-import {loginByDefault} from './LoginHelpers';
 import {useSnackbar} from 'notistack';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import {_getBackendToken} from './loginApis';
 import {NavLink} from 'react-router';
+import {handleAfterGoogleLogin, loginByDefault} from './LoginHelpers';
 
 const LeftW = styled('div')({
 })
@@ -159,34 +159,12 @@ export const LoginPage = () => {
                             </Button>
                             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
                                 <GoogleLogin
-                                    onSuccess={(response) => {
-                                        setLoadingLogin(true);
-                                        _getBackendToken(response.credential)
-                                            .then((res) => {
-                                                if(res.success) {
-                                                    enqueueSnackbar("Login successfully", { variant: 'success' });
-                                                    setUser({
-                                                        id: res.data.id,
-                                                        firstName: res.data.firstName,
-                                                        lastName: res.data.lastName,
-                                                        email: res.data.email,
-                                                        phone: res.data.phone,
-                                                        token: res.data.token,
-                                                        isLoggedIn: true,
-                                                    });
-                                                }
-                                                else {
-                                                    enqueueSnackbar("Login fail", { variant: 'error' });
-                                                }
-                                            })
-                                            .catch((error) => {
-                                                console.error("Error during login:", error);
-                                                enqueueSnackbar("Login fail", { variant: 'error' });
-                                            })
-                                            .finally(() => {
-                                                setLoadingLogin(false);
-                                            })
-                                    }}
+                                    onSuccess={(response) => handleAfterGoogleLogin({
+                                        setLoadingLogin,
+                                        setUser,
+                                        response,
+                                        enqueueSnackbar,
+                                    })}
                                     onError={() => {
                                         console.log("Login Failed");
                                     }}
