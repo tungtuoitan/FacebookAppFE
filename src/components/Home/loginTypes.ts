@@ -4,10 +4,8 @@
 
 export interface User {
     id: string;
-    firstName: string;
-    lastName: string;
+    name: string;
     email: string;
     phone: string;
     token: string;
-    isLoggedIn: boolean;
 }

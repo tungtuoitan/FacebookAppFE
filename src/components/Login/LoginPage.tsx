@@ -3,13 +3,13 @@ import {Button, IconButton, InputAdornment, Link, Paper, TextField} from '@mui/m
 import facebookBlue from '@src/assets/facebook-blue.svg'
 import {loginConstants} from './loginConstants';
 import styled from 'styled-components';
-import googleIcon from '@src/assets/google-icon.webp'
 import {useLoginStore} from './LoginStore';
 import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {loginByDefault} from './LoginHelpers';
 import {useSnackbar} from 'notistack';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import {_getBackendToken} from './loginApis';
+import {NavLink} from 'react-router';
 
 const LeftW = styled('div')({
 })
@@ -167,10 +167,12 @@ export const LoginPage = () => {
                                                     enqueueSnackbar("Login successfully", { variant: 'success' });
                                                     setUser({
                                                         id: res.data.id,
-                                                        name: res.data.name,
+                                                        firstName: res.data.firstName,
+                                                        lastName: res.data.lastName,
                                                         email: res.data.email,
                                                         phone: res.data.phone,
                                                         token: res.data.token,
+                                                        isLoggedIn: true,
                                                     });
                                                 }
                                                 else {
@@ -192,10 +194,11 @@ export const LoginPage = () => {
                             </div>
                         <Link href="#" style={{textDecoration: 'none', color: '#1877f2', fontSize: '14px', marginTop: '10px'}}>Forgotten password?</Link>
                         <div style={{height:'1px', width: '100%', margin: '20px 16px', background:'#00000030'}}> </div>
-                        <Button 
-                            style={{
+                        
+                        <Button
+                            sx={{
                                 background: loginConstants.greenStandard,
-                                color: loginConstants.whiteStandard,
+                                
                                 fontSize: '17px',
                                 textTransform: "none" ,
                                 // width: '100%',
@@ -203,9 +206,20 @@ export const LoginPage = () => {
                                 height:'48px',
                                 marginBottom: '6px',
                                 marginTop: '6px',
-
-                            }}>
-                            Create new account
+                                '&:focus': {
+                                    outline: "none !important", // Xoá viền focus
+                                    border: "none !important", // Xoá viền focus
+                                }
+                            }}
+                        >
+                            <NavLink 
+                                to={"/signup"}
+                                style={{
+                                    color: loginConstants.whiteStandard,
+                                }}
+                                >
+                                Create new account
+                            </NavLink>
                         </Button>
                     </Paper>
                     </div>

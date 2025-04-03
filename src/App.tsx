@@ -5,6 +5,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import {AllProviders} from "./AllProviders";
 import {LoginPage} from "./components/Login/LoginPage";
+import {AllRoutes} from "./routes";
 
 function App() {
     return (
@@ -17,7 +18,7 @@ function App() {
                 }}
             >
                 <AllProviders>
-                    <LoginPage/>
+                    <AllRoutes />
                 </AllProviders>
             </div>
         </div>

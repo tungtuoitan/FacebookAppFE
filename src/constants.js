@@ -28,6 +28,8 @@ export const constants = {
     endpoints: {
         login: "auth/login",
         login: "auth/getBackendToken",
+
+        signUpByDefault: "auth/signUpByDefault",
     },
     accessRightsComponents: {
         finShark: "finShark",
