@@ -18,7 +18,7 @@ const RightW = styled('div')({
 
 
 export const LoginPage = () => {
-    const {emailOrPhone, setEmailOrPhone, password, setPassword, showPassword, setShowPassword, loadingLogin, setLoadingLogin, user, setUser} = useLoginStore();
+    const {emailOrPhone, setEmailOrPhone, password, setPassword, showPassword, setShowPassword, loadingLogin, setLoadingLogin, user, setUser, displayIntroduction} = useLoginStore();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     return <>
         <div style={{
@@ -38,23 +38,38 @@ export const LoginPage = () => {
                 alignItems: 'center',
                 gap: '40px',
             }}>
-                <LeftW style={{
-                    width: '500px',
-                    height: '100%',
-                    paddingTop: '40px'
-                }}>
-                    <div style={{width: '320px', height: '106px', marginBottom: '20px'}}>
-                        <img src={facebookBlue} alt="Logo" style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain',
-                        }} />
-                    </div>
-                    <p style={{fontSize: '28px', color:'#1c1e21', margin: '-20px 0 0 28px'}}>
-                    Facebook helps you connect and share with the people in your life.
-                    </p>
-                </LeftW>
+                {displayIntroduction &&
+
+                    <LeftW 
+                    style={{
+                        width: '500px',
+                        height: '100%',
+                        paddingTop: '40px'
+                    }}
+                    >
+                        <div style={{width: '320px', height: '106px', marginBottom: '20px'}}>
+                            <img src={facebookBlue} alt="Logo" style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                            }} />
+                        </div>
+                        <p style={{fontSize: '28px', color:'#1c1e21', margin: '-20px 0 0 28px'}}>
+                        Facebook helps you connect and share with the people in your life.
+                        </p>
+                    </LeftW>
+                }
                 <RightW>
+                    { !displayIntroduction &&
+
+                        <div style={{width: '240px', height: '80px', marginLeft: '77px'}}>
+                            <img src={facebookBlue} alt="Logo" style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                            }} />
+                        </div>
+                    }
                     <div>
                     <Paper elevation={3} 
                     style={{

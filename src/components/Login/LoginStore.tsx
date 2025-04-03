@@ -13,6 +13,8 @@ interface ContextData {
     setLoadingLogin: Dispatch<SetStateAction<boolean>>;
     user: User;
     setUser: Dispatch<SetStateAction<User>>; // Assuming user is an object, you can change the type accordingly
+    displayIntroduction: boolean;
+    setDisplayIntroduction: Dispatch<SetStateAction<boolean>>;
 };
 const DefaultValue: ContextData = {
     emailOrPhone: '',
@@ -25,6 +27,8 @@ const DefaultValue: ContextData = {
     setLoadingLogin: () => { },
     user: {} as User,
     setUser: () => { },
+    displayIntroduction: true,
+    setDisplayIntroduction: () => { },
 };
 
 const LoginStore = createContext<ContextData>(DefaultValue);
@@ -36,6 +40,7 @@ export const LoginProvider: React.FC<React.PropsWithChildren<React.PropsWithChil
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [loadingLogin, setLoadingLogin] = useState<boolean>(false);
     const [user, setUser] = useState<User>({} as User); // Assuming user is an object, you can change the type accordingly
+    const [displayIntroduction, setDisplayIntroduction] = useState<boolean>(true);
 
     return (
         <LoginStore.Provider
@@ -50,6 +55,8 @@ export const LoginProvider: React.FC<React.PropsWithChildren<React.PropsWithChil
                 setLoadingLogin,
                 user,
                 setUser,
+                displayIntroduction,
+                setDisplayIntroduction,
             }}>
             {children}
         </LoginStore.Provider>

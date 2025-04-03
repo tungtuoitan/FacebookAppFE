@@ -61,29 +61,29 @@ export const handleAfterGoogleLogin = ({
     enqueueSnackbar,
 }: onChangeSignUpFormProps) => {
     setLoadingLogin(true);
-        _getBackendToken(response.credential)
-            .then((res) => {
-                if(res.success) {
-                    enqueueSnackbar("Login successfully", { variant: 'success' });
-                    setUser({
-                        id: res.data.id,
-                        firstName: res.data.firstName,
-                        lastName: res.data.lastName,
-                        email: res.data.email,
-                        phone: res.data.phone,
-                        token: res.data.token,
-                        isLoggedIn: true,
-                    });
-                }
-                else {
-                    enqueueSnackbar("Login fail", { variant: 'error' });
-                }
-            })
-            .catch((error) => {
-                console.error("Error during login:", error);
+    _getBackendToken(response.credential)
+        .then((res) => {
+            if(res.success) {
+                enqueueSnackbar("Login successfully", { variant: 'success' });
+                setUser({
+                    id: res.data.id,
+                    firstName: res.data.firstName,
+                    lastName: res.data.lastName,
+                    email: res.data.email,
+                    phone: res.data.phone,
+                    token: res.data.token,
+                    isLoggedIn: true,
+                });
+            }
+            else {
                 enqueueSnackbar("Login fail", { variant: 'error' });
-            })
-            .finally(() => {
-                setLoadingLogin(false);
-            })
+            }
+        })
+        .catch((error) => {
+            console.error("Error during login:", error);
+            enqueueSnackbar("Login fail", { variant: 'error' });
+        })
+        .finally(() => {
+            setLoadingLogin(false);
+        })
 }

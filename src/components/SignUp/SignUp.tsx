@@ -49,11 +49,10 @@ const Line = styled("div")({
 export const SignUpPage = () => {
     const [signUpForm, setSignUpForm] = useSignUpFormStore();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const {user, setUser, showPassword, setShowPassword} = useLoginStore();
+    const {user, setUser, showPassword, setShowPassword, setDisplayIntroduction} = useLoginStore();
     const {signUpErrors, setSignUpErrors, firstTimeInit, setFirstTimeInit} = useSignUpStore();
 
     const hasError = (signUpErrors?.firstName || signUpErrors?.lastName || signUpErrors?.emailOrPhone || signUpErrors?.dayMonthYear || signUpErrors?.newPassword || firstTimeInit) 
-
 
     return (
         <>
@@ -635,9 +634,12 @@ export const SignUpPage = () => {
                                     </Button>
                                 </div>
                                 <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                                    <NavLink to="/login" style={{ 
+                                    <NavLink to='/login'  style={{ 
                                         textDecoration: "none", fontWeight: 'normal', textAlign:'center', fontSize: '17px',
-                                        color: loginConstants.blueStandard
+                                        color: loginConstants.blueStandard,
+                                        }}
+                                        onClick={() => {
+                                            setDisplayIntroduction(false);
                                         }}
                                     >Already have an account ?</NavLink>
                                 </div>
