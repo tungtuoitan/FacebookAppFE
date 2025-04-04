@@ -5,11 +5,11 @@ import {loginConstants} from './loginConstants';
 import styled from 'styled-components';
 import {useLoginStore} from './LoginStore';
 import {Visibility, VisibilityOff} from '@mui/icons-material';
-import {loginByDefault} from './LoginHelpers';
 import {useSnackbar} from 'notistack';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import {_getBackendToken} from './loginApis';
 import {NavLink} from 'react-router';
+import {handleAfterGoogleLogin, loginByDefault} from './LoginHelpers';
 
 const LeftW = styled('div')({
 })
@@ -18,7 +18,7 @@ const RightW = styled('div')({
 
 
 export const LoginPage = () => {
-    const {emailOrPhone, setEmailOrPhone, password, setPassword, showPassword, setShowPassword, loadingLogin, setLoadingLogin, user, setUser} = useLoginStore();
+    const {emailOrPhone, setEmailOrPhone, password, setPassword, showPassword, setShowPassword, loadingLogin, setLoadingLogin, user, setUser, displayIntroduction} = useLoginStore();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     return <>
         <div style={{
@@ -38,23 +38,38 @@ export const LoginPage = () => {
                 alignItems: 'center',
                 gap: '40px',
             }}>
-                <LeftW style={{
-                    width: '500px',
-                    height: '100%',
-                    paddingTop: '40px'
-                }}>
-                    <div style={{width: '320px', height: '106px', marginBottom: '20px'}}>
-                        <img src={facebookBlue} alt="Logo" style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain',
-                        }} />
-                    </div>
-                    <p style={{fontSize: '28px', color:'#1c1e21', margin: '-20px 0 0 28px'}}>
-                    Facebook helps you connect and share with the people in your life.
-                    </p>
-                </LeftW>
+                {displayIntroduction &&
+
+                    <LeftW 
+                    style={{
+                        width: '500px',
+                        height: '100%',
+                        paddingTop: '40px'
+                    }}
+                    >
+                        <div style={{width: '320px', height: '106px', marginBottom: '20px'}}>
+                            <img src={facebookBlue} alt="Logo" style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                            }} />
+                        </div>
+                        <p style={{fontSize: '28px', color:'#1c1e21', margin: '-20px 0 0 28px'}}>
+                        Facebook helps you connect and share with the people in your life.
+                        </p>
+                    </LeftW>
+                }
                 <RightW>
+                    { !displayIntroduction &&
+
+                        <div style={{width: '240px', height: '80px', marginLeft: '77px'}}>
+                            <img src={facebookBlue} alt="Logo" style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                            }} />
+                        </div>
+                    }
                     <div>
                     <Paper elevation={3} 
                     style={{
@@ -159,34 +174,12 @@ export const LoginPage = () => {
                             </Button>
                             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
                                 <GoogleLogin
-                                    onSuccess={(response) => {
-                                        setLoadingLogin(true);
-                                        _getBackendToken(response.credential)
-                                            .then((res) => {
-                                                if(res.success) {
-                                                    enqueueSnackbar("Login successfully", { variant: 'success' });
-                                                    setUser({
-                                                        id: res.data.id,
-                                                        firstName: res.data.firstName,
-                                                        lastName: res.data.lastName,
-                                                        email: res.data.email,
-                                                        phone: res.data.phone,
-                                                        token: res.data.token,
-                                                        isLoggedIn: true,
-                                                    });
-                                                }
-                                                else {
-                                                    enqueueSnackbar("Login fail", { variant: 'error' });
-                                                }
-                                            })
-                                            .catch((error) => {
-                                                console.error("Error during login:", error);
-                                                enqueueSnackbar("Login fail", { variant: 'error' });
-                                            })
-                                            .finally(() => {
-                                                setLoadingLogin(false);
-                                            })
-                                    }}
+                                    onSuccess={(response) => handleAfterGoogleLogin({
+                                        setLoadingLogin,
+                                        setUser,
+                                        response,
+                                        enqueueSnackbar,
+                                    })}
                                     onError={() => {
                                         console.log("Login Failed");
                                     }}

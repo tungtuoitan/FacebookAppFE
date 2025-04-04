@@ -4,9 +4,6 @@ import {
     Checkbox,
     FormControl,
     FormControlLabel,
-    FormGroup,
-    FormLabel,
-    Icon,
     IconButton,
     InputAdornment,
     InputLabel,
@@ -17,19 +14,23 @@ import {
     RadioGroup,
     Select,
     TextField,
+    Tooltip,
 } from "@mui/material";
 import facebookBlue from "@src/assets/facebook-blue.svg";
 import styled from "styled-components";
 import { Help, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import {NavLink} from "react-router";
+import {NavLink, useNavigate} from "react-router";
 import {useSignUpFormStore} from "./SignUpFormStore";
-import {onChangeSignUpForm, signUpByDefault} from "./SignUpHelpers";
-import {getAllDaysInMonth, getAllMonths, getAllYearsFrom1900ToCurrent} from "./SignUpHelpers";
-import {_signUpByDefault} from "./signUpApis";
+import {getAllDaysInMonth, getAllMonths, getAllYearsFrom1900ToCurrent, onChangeSignUpForm, signUpByDefault, validateSignUpForm} from "./SignUpHelpers";
 import {useLoginStore} from "../Login/LoginStore";
 import {signUpConstants} from "./signUpConstants";
 import {loginConstants} from "../Login/loginConstants";
+import {sign} from "crypto";
+import {useSignUpStore} from "./signUpStore";
+import ErrorIcon from '@mui/icons-material/Error';
+
+
 const TopPaper = styled("div")({});
 const MiddlePaper = styled("div")({});
 const BottomPaper = styled("div")({});
@@ -41,12 +42,17 @@ const Line = styled("div")({
     gap: "10px",
 });
 
+
+
+
 export const SignUpPage = () => {
     const [signUpForm, setSignUpForm] = useSignUpFormStore();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const {user, setUser, showPassword, setShowPassword} = useLoginStore();
-    console.log("SignUpPage", signUpForm);
+    const {user, setUser, showPassword, setShowPassword, setDisplayIntroduction} = useLoginStore();
+    const {signUpErrors, setSignUpErrors, firstTimeInit, setFirstTimeInit} = useSignUpStore();
+    const navigate = useNavigate();
 
+    const hasError = (signUpErrors?.firstName || signUpErrors?.lastName || signUpErrors?.emailOrPhone || signUpErrors?.dayMonthYear || signUpErrors?.newPassword || firstTimeInit) 
 
     return (
         <>
@@ -155,7 +161,7 @@ export const SignUpPage = () => {
                             </div>
                             <MiddlePaper
                                 style={{
-                                    padding: "16px",
+                                    padding: "16px 16px 0 16px",
                                     width: "100%",
                                 }}
                             >
@@ -165,7 +171,13 @@ export const SignUpPage = () => {
                                         label="First name"
                                         name="firstName"
                                         value={signUpForm?.firstName ?? ""}
-                                        onChange={(e) => onChangeSignUpForm({signUpForm,setSignUpForm,fieldName: e.target.name,fieldValue: e.target.value})}
+                                        onChange={(e) => onChangeSignUpForm({
+                                            signUpForm,
+                                            setSignUpForm,
+                                            fieldName: e.target.name,
+                                            fieldValue: e.target.value,
+                                            setFirstTimeInit
+                                        })}
                                         fullWidth
                                         sx={{
                                             height: "40px",
@@ -175,6 +187,25 @@ export const SignUpPage = () => {
                                             "& label.MuiFormLabel-root[data-shrink='false']": {
                                                 top: "-7px",
                                             },
+                                        }}
+                                        error={signUpErrors?.firstName}
+                                        onBlur={(e) => validateSignUpForm({
+                                            fieldName: e.target.name, 
+                                            fieldValue: e.target.value, 
+                                            setSignUpErrors, 
+                                            signUpErrors,
+                                            signUpForm
+                                        })}
+                                        slotProps={{
+                                            input: {
+                                                endAdornment: (<div style={{marginRight: '-14px'}}>
+                                                    {signUpErrors?.firstName 
+                                                        ? <ErrorIconn errorContent={signUpConstants.errorContent.firstName}/>
+                                                        : <div style={{width:'34px', height:'34px'}}/>
+                                                    }
+                                                </div>
+                                                ),
+                                            }
                                         }}
                                     />
                                     <TextField
@@ -182,7 +213,13 @@ export const SignUpPage = () => {
                                         label="Last Name"
                                         name="lastName"
                                         value={signUpForm?.lastName ?? ""}
-                                        onChange={(e) => onChangeSignUpForm({signUpForm,setSignUpForm,fieldName: e.target.name,fieldValue: e.target.value})}
+                                        onChange={(e) => onChangeSignUpForm({
+                                            signUpForm,
+                                            setSignUpForm,
+                                            fieldName: e.target.name,
+                                            fieldValue: e.target.value,
+                                            setFirstTimeInit
+                                        })}
                                         fullWidth
                                         sx={{
                                             height: "40px",
@@ -193,27 +230,54 @@ export const SignUpPage = () => {
                                                 top: "-7px",
                                             },
                                         }}
+                                        error={signUpErrors?.lastName || false}
+                                        onBlur={(e) => validateSignUpForm({
+                                            fieldName: e.target.name, 
+                                            fieldValue: e.target.value, 
+                                            setSignUpErrors, 
+                                            signUpErrors,
+                                            signUpForm
+                                        })}
+                                        slotProps={{
+                                            input: {
+                                                endAdornment: (<div style={{marginRight: '-14px'}}>
+                                                    {signUpErrors?.lastName 
+                                                        ? <ErrorIconn errorContent={signUpConstants.errorContent.lastName}/>
+                                                        : <div style={{width:'34px', height:'34px'}}/>
+                                                    }
+                                                </div>
+                                                ),
+                                            }
+                                        }}
                                     />
                                 </Line>
                                 <div style={{ margin: "5px 0" }}>
-                                    <div>
-                                        <span
-                                            style={{
-                                                fontSize: "12px",
-                                                color: "#00000080",
-                                                marginRight: "-4px",
-                                            }}
-                                        >
-                                            Birthday
-                                        </span>
-                                        <IconButton>
-                                            <Help
-                                                sx={{
+                                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                        <div>
+                                            <span
+                                                style={{
+                                                    fontSize: "12px",
                                                     color: "#00000080",
-                                                    fontSize: "14px",
+                                                    marginRight: "-4px",
                                                 }}
-                                            />
-                                        </IconButton>
+                                            >
+                                                Birthday
+                                            </span>
+                                            <IconButton>
+                                                <Help
+                                                    sx={{
+                                                        color: "#00000080",
+                                                        fontSize: "14px",
+                                                        outline: "none !important",
+                                                        border: "none !important",
+                                                    }}
+                                                />
+                                            </IconButton>
+                                        </div>
+                                        {signUpErrors?.dayMonthYear 
+                                            ? <ErrorIconn errorContent={signUpConstants.errorContent.dayMonthYear}/>
+                                            : <div style={{width:'34px', height:'34px'}}/>
+                                        }
                                     </div>
                                     <div
                                         style={{
@@ -237,12 +301,21 @@ export const SignUpPage = () => {
                                                     setSignUpForm,
                                                     fieldName: e.target.name,
                                                     fieldValue: e.target.value,
+                                                    setFirstTimeInit
                                                 })}
                                                 sx={{
                                                     height: "40px",
                                                 }}
+                                                error={signUpErrors?.dayMonthYear}
+                                                onBlur={(e) => validateSignUpForm({
+                                                    fieldName: e.target.name, 
+                                                    fieldValue: e.target.value, 
+                                                    setSignUpErrors, 
+                                                    signUpErrors,
+                                                    signUpForm
+                                                })}
                                             >
-                                                {getAllDaysInMonth(1, 2025).map((day) => (
+                                                {getAllDaysInMonth().map((day) => (
                                                     <MenuItem key={day.code} value={day.code}>
                                                         {day.desc}
                                                     </MenuItem>
@@ -262,6 +335,7 @@ export const SignUpPage = () => {
                                                     setSignUpForm,
                                                     fieldName: e.target.name,
                                                     fieldValue: e.target.value,
+                                                    setFirstTimeInit
                                                 })}
                                                 sx={{
                                                     height: "40px",
@@ -269,6 +343,14 @@ export const SignUpPage = () => {
                                                         width: "48px",
                                                     },
                                                 }}
+                                                error={signUpErrors?.dayMonthYear}
+                                                onBlur={(e) => validateSignUpForm({
+                                                    fieldName: e.target.name, 
+                                                    fieldValue: e.target.value, 
+                                                    setSignUpErrors, 
+                                                    signUpErrors,
+                                                    signUpForm
+                                                })}
                                             >
                                                 {getAllMonths().map((month) => (
                                                     <MenuItem key={month.code} value={month.code}>
@@ -290,6 +372,7 @@ export const SignUpPage = () => {
                                                     setSignUpForm,
                                                     fieldName: e.target.name,
                                                     fieldValue: e.target.value,
+                                                    setFirstTimeInit
                                                 })}
                                                 sx={{
                                                     height: "40px",
@@ -297,6 +380,7 @@ export const SignUpPage = () => {
                                                         width: "36px",
                                                     },
                                                 }}
+                                                error={signUpErrors?.dayMonthYear}
                                             >
                                                 {getAllYearsFrom1900ToCurrent().map((year) => (
                                                     <MenuItem key={year.code} value={year.desc}>
@@ -350,6 +434,7 @@ export const SignUpPage = () => {
                                                     setSignUpForm,
                                                     fieldName: e.target.name,
                                                     fieldValue: e.target.value,
+                                                    setFirstTimeInit
                                                 })}
                                                 sx={{
                                                     display: "flex",
@@ -384,6 +469,7 @@ export const SignUpPage = () => {
                                             setSignUpForm,
                                             fieldName: e.target.name,
                                             fieldValue: e.target.value,
+                                            setFirstTimeInit
                                         })}
                                         fullWidth
                                         sx={{
@@ -395,6 +481,25 @@ export const SignUpPage = () => {
                                             "& label.MuiFormLabel-root[data-shrink='false']": {
                                                 top: "-7px",
                                             },
+                                        }}
+                                        error={signUpErrors?.emailOrPhone}
+                                        onBlur={(e) => validateSignUpForm({
+                                            fieldName: e.target.name, 
+                                            fieldValue: e.target.value, 
+                                            setSignUpErrors, 
+                                            signUpErrors,
+                                            signUpForm
+                                        })}
+                                        slotProps={{
+                                            input: {
+                                                endAdornment: (<div style={{marginRight: '-14px'}}>
+                                                    {signUpErrors?.emailOrPhone 
+                                                        ? <ErrorIconn errorContent={signUpConstants.errorContent.emailOrPhone}/>
+                                                        : <div style={{width:'34px', height:'34px'}}/>
+                                                    }
+                                                </div>
+                                                ),
+                                            }
                                         }}
                                     />
                                     <TextField
@@ -408,6 +513,7 @@ export const SignUpPage = () => {
                                             setSignUpForm,
                                             fieldName: e.target.name,
                                             fieldValue: e.target.value,
+                                            setFirstTimeInit
                                         })}
                                         fullWidth
                                         slotProps={{
@@ -429,7 +535,14 @@ export const SignUpPage = () => {
                                                         >
                                                             {showPassword ? <VisibilityOff /> : <Visibility />}
                                                         </IconButton>
+                                                        <div style={{marginRight: '-14px'}}>
+                                                            {signUpErrors?.newPassword
+                                                                ? <ErrorIconn errorContent={signUpConstants.errorContent.newPassword}/>
+                                                                : <div style={{width:'34px', height:'34px', opacity: 0}}/>
+                                                            }
+                                                        </div>
                                                     </InputAdornment>
+                                                    
                                                 ),
                                             }
                                         }}
@@ -454,16 +567,26 @@ export const SignUpPage = () => {
                                                 WebkitTextSecurity: showPassword ? "none" : "disc", // Điều chỉnh kiểu hiển thị mật khẩu
                                             },
                                         }}
+                                        error={signUpErrors?.newPassword}
+                                        onBlur={(e) => validateSignUpForm({
+                                            fieldName: e.target.name, 
+                                            fieldValue: e.target.value, 
+                                            setSignUpErrors, 
+                                            signUpErrors,
+                                            signUpForm
+                                        })}
+
                                     />
                                 </div>
                             </MiddlePaper>
 
-                            <BottomPaper style={{ padding: "16px" }}>
+                            <BottomPaper style={{ padding: "0 16px 16px 16px" }}>
                                 <p
                                     style={{
                                         fontSize: "11px",
                                         color: "#00000080",
                                         margin: "0 0 10px 0",
+                                        lineHeight: '1.34',
                                     }}
                                 >
                                     Users of our services may have uploaded your contact information to Facebook. Learn more.
@@ -473,6 +596,7 @@ export const SignUpPage = () => {
                                         fontSize: "11px",
                                         color: "#00000080",
                                         margin: "0 0 10px 0",
+                                        lineHeight: '1.34',
                                     }}
                                 >
                                     By clicking Register, you agree to our Terms, Privacy Policy, and Cookie Policy. You can receive our notifications
@@ -480,15 +604,16 @@ export const SignUpPage = () => {
                                 </p>
                                 <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
                                     <Button
-                                    onClick={() => signUpByDefault({
-                                        signUpForm,
-                                        setSignUpForm,
-                                        user,
-                                        setUser,
-                                        enqueueSnackbar,
-                                    })}
+                                        onClick={() => signUpByDefault({
+                                            signUpForm,
+                                            setSignUpForm,
+                                            user,
+                                            setUser,
+                                            enqueueSnackbar,
+                                            navigate,
+                                        })}
                                         sx={{
-                                            background: loginConstants.greenStandard,
+                                            background: hasError ? loginConstants.grayStandard : loginConstants.greenStandard,
                                             color: loginConstants.whiteStandard,
 
                                             fontSize: "17px",
@@ -504,14 +629,18 @@ export const SignUpPage = () => {
                                                 border: "none !important", // Xoá viền focus
                                             },
                                         }}
+                                        disabled={hasError}
                                     >
                                         Register
                                     </Button>
                                 </div>
                                 <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                                    <NavLink to="/login" style={{ 
+                                    <NavLink to='/login'  style={{ 
                                         textDecoration: "none", fontWeight: 'normal', textAlign:'center', fontSize: '17px',
-                                        color: loginConstants.blueStandard
+                                        color: loginConstants.blueStandard,
+                                        }}
+                                        onClick={() => {
+                                            setDisplayIntroduction(false);
                                         }}
                                     >Already have an account ?</NavLink>
                                 </div>
@@ -523,3 +652,31 @@ export const SignUpPage = () => {
         </>
     );
 };
+
+type ErrorIconnProps = {
+    errorContent: string;
+}
+const ErrorIconn = (props:ErrorIconnProps) => {
+    const { errorContent } = props;
+    return (
+        <Tooltip title={errorContent} placement="top" arrow 
+            slotProps={{
+                tooltip: {
+                sx: {
+                    color: "white",
+                    backgroundColor: "#BE4B49",
+                },
+                },
+            }}
+        >
+            <IconButton sx={{
+                "&": {
+                    outline: "none !important",
+                    border: "none !important",
+                }
+            }}>
+                <ErrorIcon sx={{ color: "#e74c3c", fontSize: "18px" }} />
+            </IconButton>
+        </Tooltip>
+    )
+}

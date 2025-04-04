@@ -1,9 +1,10 @@
 import { SnackbarKey, SnackbarProvider } from "notistack";
-import { LoginProvider } from "./components/Login/LoginStore";
 import { CloseNotiBtn } from "./components/CommonHelpers/1_CloseNotiBtn";
 import {GoogleOAuthProvider} from "@react-oauth/google";
 import {loginConstants} from "./components/Login/loginConstants";
+import {SignUpProvider} from "./components/SignUp/signUpStore";
 import {SignUpFormStoreProvider} from "./components/SignUp/SignUpFormStore";
+import {LoginProvider} from "./components/Login/LoginStore";
 
 export const AllProviders = ({
     children,
@@ -16,7 +17,9 @@ export const AllProviders = ({
             >
                 <GoogleOAuthProvider clientId={loginConstants.googleClientId}>
                     <SignUpFormStoreProvider>
-                        <LoginProvider>{children}</LoginProvider>
+                        <SignUpProvider>
+                            <LoginProvider>{children}</LoginProvider>
+                        </SignUpProvider>
                     </SignUpFormStoreProvider>
                 </GoogleOAuthProvider>
             </SnackbarProvider>

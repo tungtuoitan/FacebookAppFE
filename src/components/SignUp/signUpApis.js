@@ -1,37 +1,28 @@
 
 import { constants } from "../../constants";
+import {checkPhoneOrEmail} from "./SignUpHelpers";
 
 
 export const _signUpByDefault = async (params) => {
-    const {
-        firstName = '',
-        lastName = '',
-        emailOrPhone = '',
-        gender = "",
-        day = "",
-        month = "",
-        year = "",
-        newPassword = '',
-    } = params;
 
     const headers = new Headers({
         // Authorization: `Bearer ${token}`,
     });
 
-    const formData = new FormData();
-    formData.append("firstName", firstName || '');
-    formData.append("lastName", lastName || '');
-    formData.append("emailOrPhone", emailOrPhone || '');
-    formData.append("gender", gender || '');
-    formData.append("day", day || '');
-    formData.append("month", month || '');
-    formData.append("year", year || '');
-    formData.append("newPassword", newPassword || '');
+    const mappedData = {
+        first_name: params.firstName || '',
+        sur_name: params.lastName || '',
+        email: checkPhoneOrEmail(params.emailOrPhone) === "email" ? (params.emailOrPhone || '') : '',
+        phone_number: checkPhoneOrEmail(params.emailOrPhone) === "phone" ? (params.emailOrPhone || '') : '',
+        gender: Number(params.gender) || '',
+        password: params.newPassword || '',
+        birthday: `${params.year}-${String(params.month).padStart(2,'0')}-${String(params.day).padStart(2,'0')}` || '',
+    }
 
     const options = {
         method: "POST",
         headers: headers,
-        body: formData, 
+        body: JSON.stringify(mappedData), 
     };
 
     // URL = env + APIEndpoint + Params

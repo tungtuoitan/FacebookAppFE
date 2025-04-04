@@ -4,11 +4,11 @@ export const constants = {
         timeline: {
             pro: {
                 hostname: "157.66.101.214", // hostname is IP, cauze we dont have domain name
-                baseUrl: "http://157.66.101.214:5000/",
+                baseUrl: "https://157.66.101.214:8000/",
             },
             loc: {
                 hostname: "localhost",
-                baseUrl: "https://localhost:5000/",
+                baseUrl: "http://[::1]:8000/",
             },
         },
         getBaseUrl: function () {
@@ -27,9 +27,7 @@ export const constants = {
     // 4. API Endpoints
     endpoints: {
         login: "auth/login",
-        login: "auth/getBackendToken",
-
-        signUpByDefault: "auth/signUpByDefault",
+        signUpByDefault: "auth/register",
     },
     accessRightsComponents: {
         finShark: "finShark",
