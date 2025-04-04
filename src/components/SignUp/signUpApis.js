@@ -7,6 +7,7 @@ export const _signUpByDefault = async (params) => {
 
     const headers = new Headers({
         // Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
     });
 
     const mappedData = {
