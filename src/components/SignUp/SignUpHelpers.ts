@@ -56,6 +56,7 @@ type signUpProps = {
     user: any;
     setUser: any;
     enqueueSnackbar?: any;
+    navigate?: any;
 }
 export const signUpByDefault = ({
     signUpForm,
@@ -63,6 +64,7 @@ export const signUpByDefault = ({
     user,
     setUser,
     enqueueSnackbar,
+    navigate,
 }:signUpProps) => {
     _signUpByDefault(signUpForm)
         .then((res: any) => {
@@ -78,7 +80,7 @@ export const signUpByDefault = ({
                     token: res.data.token,
                     isLoggedIn: true,
                 })
-
+                navigate("/home", {replace: true});
             }
             else {
                 console.log("Sign Up failed:", res.statusText);
@@ -205,7 +207,7 @@ export const getAllYearsFrom1900ToCurrent = () => {
 }
 
 
-function checkPhoneOrEmail(x: string): "phone" | "email" | "unknown" {
+export function checkPhoneOrEmail(x: string): "phone" | "email" | "unknown" {
     const phoneRegex = /^[0-9]{8,15}$/; // Số điện thoại chỉ chứa số, dài từ 8-15 chữ số
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Email hợp lệ
 

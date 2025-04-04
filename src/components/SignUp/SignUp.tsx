@@ -20,10 +20,9 @@ import facebookBlue from "@src/assets/facebook-blue.svg";
 import styled from "styled-components";
 import { Help, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import {NavLink} from "react-router";
+import {NavLink, useNavigate} from "react-router";
 import {useSignUpFormStore} from "./SignUpFormStore";
 import {getAllDaysInMonth, getAllMonths, getAllYearsFrom1900ToCurrent, onChangeSignUpForm, signUpByDefault, validateSignUpForm} from "./SignUpHelpers";
-import {_signUpByDefault} from "./signUpApis";
 import {useLoginStore} from "../Login/LoginStore";
 import {signUpConstants} from "./signUpConstants";
 import {loginConstants} from "../Login/loginConstants";
@@ -51,6 +50,7 @@ export const SignUpPage = () => {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const {user, setUser, showPassword, setShowPassword, setDisplayIntroduction} = useLoginStore();
     const {signUpErrors, setSignUpErrors, firstTimeInit, setFirstTimeInit} = useSignUpStore();
+    const navigate = useNavigate();
 
     const hasError = (signUpErrors?.firstName || signUpErrors?.lastName || signUpErrors?.emailOrPhone || signUpErrors?.dayMonthYear || signUpErrors?.newPassword || firstTimeInit) 
 
@@ -610,6 +610,7 @@ export const SignUpPage = () => {
                                             user,
                                             setUser,
                                             enqueueSnackbar,
+                                            navigate,
                                         })}
                                         sx={{
                                             background: hasError ? loginConstants.grayStandard : loginConstants.greenStandard,

@@ -8,6 +8,7 @@ export const AllRoutes = () => {
     return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" index element={<LoginPage />}/>
         <Route path="/login" index element={<LoginPage />}/>
         <Route path="/home"  element={<Home />} />
         <Route path="/signup"  element={<SignUpPage />} />
